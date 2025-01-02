@@ -1,0 +1,105 @@
+.goal-tracker-controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1em;
+	padding: 0.5em;
+}
+
+.goal-tracker-calendar {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+}
+
+.calendar-row {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 0.5em;
+}
+
+.calendar-cell {
+	padding: 0.5em;
+	text-align: center;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.calendar-cell:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.calendar-cell.header {
+	font-weight: bold;
+	background-color: var(--background-modifier-hover);
+	cursor: default;
+}
+
+.calendar-cell.empty {
+	background-color: var(--background-secondary);
+	cursor: default;
+}
+
+.calendar-cell.completed {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.goal-tracker-calendar.monthly {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 0.5em;
+}
+
+.goal-tracker-calendar.weekly .week-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.8em;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.goal-tracker-calendar.weekly .week-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2em;
+}
+
+.goal-tracker-calendar.weekly .week-number {
+	font-weight: bold;
+}
+
+.goal-tracker-calendar.weekly .week-dates {
+	font-size: 0.9em;
+	color: var(--text-muted);
+}
+
+.goal-tracker-calendar.weekly .calendar-cell {
+	width: 2em;
+	height: 2em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.goal-tracker-title {
+	margin-bottom: 1em;
+	text-align: center;
+}
+
+.goal-tracker-calendar.monthly + .goal-tracker-controls {
+	justify-content: center;
+	gap: 1em;
+}
+
+.goal-tracker-calendar.monthly + .goal-tracker-controls .year-display {
+	font-size: 1.2em;
+	font-weight: bold;
+	min-width: 4em;
+	text-align: center;
+}
+
+.goal-tracker-calendar.monthly + .goal-tracker-controls button {
+	padding: 0.5em 1em;
+}
