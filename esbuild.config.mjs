@@ -32,12 +32,18 @@ const context = await esbuild.context({
 		"@lezer/lr",
 		...builtins,
 	],
-	format: "cjs",
-	target: "es2018",
+	format: "esm",
+	target: "es2020",
 	logLevel: "info",
 	sourcemap: prod ? false : "inline",
 	treeShaking: true,
 	outfile: "main.js",
+	minify: prod,
+	platform: "browser",
+	define: {
+		"process.env.NODE_ENV": JSON.stringify(prod ? "production" : "development"),
+	},
+	charset: "utf8",
 });
 
 if (prod) {
