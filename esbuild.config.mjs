@@ -32,7 +32,7 @@ const context = await esbuild.context({
 		"@lezer/lr",
 		...builtins,
 	],
-	format: "esm",
+	format: "cjs",
 	target: "es2020",
 	logLevel: "info",
 	sourcemap: prod ? false : "inline",

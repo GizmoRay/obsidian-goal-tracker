@@ -23,8 +23,45 @@ export class GoalCalendar {
 		this.data = data;
 		this.options = options;
 		this.onUpdate = onUpdate;
-		this.currentYear = new Date().getFullYear();
-		this.currentMonth = new Date().getMonth();
+
+		// Only set initial date if it's a new calendar (no goals yet)
+		if (Object.keys(this.data.goals).length === 0) {
+			const today = new Date();
+			this.currentYear = today.getFullYear();
+			this.currentMonth = today.getMonth();
+		} else {
+			// Try to get the date from URL parameters or default to current date
+			const params = new URLSearchParams(window.location.hash.slice(1));
+			this.currentYear = parseInt(
+				params.get("year") || new Date().getFullYear().toString()
+			);
+			this.currentMonth = parseInt(
+				params.get("month") || new Date().getMonth().toString()
+			);
+		}
+	}
+
+	private async updateGoal(dateString: string, isCompleted: boolean) {
+		this.data.goals[dateString] = !isCompleted;
+		await this.onUpdate(this.data);
+	}
+
+	private updateUrlParams() {
+		// Update URL parameters without triggering a page reload
+		const params = new URLSearchParams(window.location.hash.slice(1));
+		params.set("year", this.currentYear.toString());
+		params.set("month", this.currentMonth.toString());
+		window.history.replaceState(null, "", `#${params.toString()}`);
+	}
+
+	// Update the navigation methods to maintain state
+	private navigateToDate(year: number, month?: number) {
+		this.currentYear = year;
+		if (month !== undefined) {
+			this.currentMonth = month;
+		}
+		this.updateUrlParams();
+		this.render();
 	}
 
 	render() {
@@ -223,23 +260,19 @@ export class GoalCalendar {
 		});
 		const nextButton = controls.createEl("button", { text: "→" });
 
-		// For monthly view, only handle year navigation
+		// For monthly view
 		if (this.options.type === "monthly") {
 			prevButton.addEventListener("click", () => {
-				this.currentYear--;
-				yearSpan.textContent = this.currentYear.toString();
-				this.render();
+				this.navigateToDate(this.currentYear - 1);
 			});
 
 			nextButton.addEventListener("click", () => {
-				this.currentYear++;
-				yearSpan.textContent = this.currentYear.toString();
-				this.render();
+				this.navigateToDate(this.currentYear + 1);
 			});
 			return;
 		}
 
-		// For daily and weekly views, keep the existing month/year navigation
+		// For daily and weekly views
 		const monthSelect = controls.createEl("select");
 		const months = [
 			"January",
@@ -267,32 +300,28 @@ export class GoalCalendar {
 		});
 
 		monthSelect.addEventListener("change", (e) => {
-			this.currentMonth = parseInt((e.target as HTMLSelectElement).value);
-			this.render();
+			this.navigateToDate(
+				this.currentYear,
+				parseInt((e.target as HTMLSelectElement).value)
+			);
 		});
 
 		prevButton.addEventListener("click", () => {
 			if (this.currentMonth === 0) {
-				this.currentMonth = 11;
-				this.currentYear--;
+				this.navigateToDate(this.currentYear - 1, 11);
 			} else {
-				this.currentMonth--;
+				this.navigateToDate(this.currentYear, this.currentMonth - 1);
 			}
 			monthSelect.value = this.currentMonth.toString();
-			yearSpan.textContent = this.currentYear.toString();
-			this.render();
 		});
 
 		nextButton.addEventListener("click", () => {
 			if (this.currentMonth === 11) {
-				this.currentMonth = 0;
-				this.currentYear++;
+				this.navigateToDate(this.currentYear + 1, 0);
 			} else {
-				this.currentMonth++;
+				this.navigateToDate(this.currentYear, this.currentMonth + 1);
 			}
 			monthSelect.value = this.currentMonth.toString();
-			yearSpan.textContent = this.currentYear.toString();
-			this.render();
 		});
 	}
 }

@@ -18,7 +18,7 @@ export default class GoalTrackerPlugin extends Plugin {
 				let calendarData: CalendarData;
 				let options: CalendarOptions = {
 					type: "daily",
-					title: "Goal Tracker",
+					title: "Goal tracker",
 				};
 
 				try {
@@ -74,24 +74,21 @@ export default class GoalTrackerPlugin extends Plugin {
 							return;
 						}
 
-						const content = await this.app.vault.read(file);
-						const sectionInfo = ctx.getSectionInfo(el);
-						if (!sectionInfo) {
-							console.error("Could not find section info");
-							return;
-						}
+						await this.app.vault.process(file, (content) => {
+							const sectionInfo = ctx.getSectionInfo(el);
+							if (!sectionInfo) {
+								console.error("Could not find section info");
+								return content;
+							}
 
-						const newContent = this.updateCalendarBlock(
-							content,
-							sectionInfo,
-							`type: ${options.type}\ntitle: ${options.title}\n${JSON.stringify(
-								updatedData,
-								null,
-								2
-							)}`
-						);
-
-						await this.app.vault.modify(file, newContent);
+							return this.updateCalendarBlock(
+								content,
+								sectionInfo,
+								`type: ${options.type}\ntitle: ${
+									options.title
+								}\n${JSON.stringify(updatedData, null, 2)}`
+							);
+						});
 					}
 				);
 				calendar.render();
