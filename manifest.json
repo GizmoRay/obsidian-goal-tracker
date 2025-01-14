@@ -1,7 +1,7 @@
 {
 	"id": "goal-tracker",
 	"name": "Goal Tracker",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"minAppVersion": "1.2.0",
 	"description": "Track your goals with a calendar view",
 	"author": "Ben Rotholtz",
