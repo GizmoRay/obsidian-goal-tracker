@@ -27,5 +27,20 @@ To add a goal tracker to your note, create a code block with the `goal-calendar`
   
   <img width="673" alt="image" src="https://github.com/user-attachments/assets/9640b76e-0e91-4d31-b381-ab7e5998f7f8" />
 
+Example:
+```goal-calendar
+type: weekly
+title: No wasted weekends - do something fun every weekend
+{
+  "id": "1d38cb0a-a6bc-44d4-9726-0fba43da17f6",
+  "type": "weekly",
+  "title": "No wasted weekends - do something fun every weekend",
+  "goals": {
+    "2025-W1": true,
+    "2025-W2": true
+  }
+}
+```
 
+<img width="669" alt="image" src="https://github.com/user-attachments/assets/7dbddb37-d102-4165-9751-3ddba407b99f" />
 
