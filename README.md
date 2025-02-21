@@ -17,20 +17,29 @@ A simple and flexible goal tracking plugin for Obsidian that allows you to track
 ### Adding a Tracker
 
 To add a goal tracker to your note, create a code block with the `goal-calendar` language and specify your options:
+
 - daily
-  
+
   <img width="712" alt="image" src="https://github.com/user-attachments/assets/ccd5067f-661d-49c1-8684-b09999662c6f" />
+
 - weekly
-  
+
   <img width="720" alt="image" src="https://github.com/user-attachments/assets/b774015a-9a3c-4772-b3ae-50cc49b5ab74" />
+
 - monthly
-  
+
   <img width="673" alt="image" src="https://github.com/user-attachments/assets/9640b76e-0e91-4d31-b381-ab7e5998f7f8" />
 
+#### Streak tracker
+
+Use "status: on" within the configuration to enable a longest recent streak feature.
+
 Example:
+
 ```goal-calendar
 type: weekly
 title: No wasted weekends - do something fun every weekend
+streak: on
 {
   "id": "1d38cb0a-a6bc-44d4-9726-0fba43da17f6",
   "type": "weekly",
@@ -43,4 +52,3 @@ title: No wasted weekends - do something fun every weekend
 ```
 
 <img width="669" alt="image" src="https://github.com/user-attachments/assets/7dbddb37-d102-4165-9751-3ddba407b99f" />
-
