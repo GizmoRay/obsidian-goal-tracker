@@ -103,3 +103,10 @@
 .goal-tracker-calendar.monthly + .goal-tracker-controls button {
 	padding: 0.5em 1em;
 }
+
+.goal-tracker-streak {
+	margin-bottom: 1em;
+	font-weight: 500;
+	color: var(--text-accent);
+	text-align: center;
+}

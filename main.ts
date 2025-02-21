@@ -11,14 +11,17 @@ export interface CalendarData {
 }
 
 export default class GoalTrackerPlugin extends Plugin {
+	private options: CalendarOptions;
+
 	async onload() {
 		this.registerMarkdownCodeBlockProcessor(
 			"goal-calendar",
 			async (source, el, ctx) => {
 				let calendarData: CalendarData;
-				let options: CalendarOptions = {
+				this.options = {
 					type: "daily",
 					title: "Goal tracker",
+					showStreak: false,
 				};
 
 				try {
@@ -32,9 +35,14 @@ export default class GoalTrackerPlugin extends Plugin {
 						const trimmedValue = value.trim();
 
 						if (trimmedKey === "type") {
-							options.type = trimmedValue as "daily" | "weekly" | "monthly";
+							this.options.type = trimmedValue as
+								| "daily"
+								| "weekly"
+								| "monthly";
 						} else if (trimmedKey === "title") {
-							options.title = trimmedValue;
+							this.options.title = trimmedValue;
+						} else if (trimmedKey === "streak") {
+							this.options.showStreak = trimmedValue.toLowerCase() === "on";
 						}
 						lines.shift();
 					}
@@ -45,20 +53,20 @@ export default class GoalTrackerPlugin extends Plugin {
 					} else {
 						calendarData = {
 							id: crypto.randomUUID(),
-							type: options.type,
-							title: options.title,
+							type: this.options.type,
+							title: this.options.title,
 							goals: {},
 						};
 					}
 
 					// Ensure title is set in data
-					calendarData.title = options.title;
+					calendarData.title = this.options.title;
 				} catch (e) {
 					console.error("Failed to parse calendar data", e);
 					calendarData = {
 						id: crypto.randomUUID(),
-						type: options.type,
-						title: options.title,
+						type: this.options.type,
+						title: this.options.title,
 						goals: {},
 					};
 				}
@@ -66,7 +74,7 @@ export default class GoalTrackerPlugin extends Plugin {
 				const calendar = new GoalCalendar(
 					el,
 					calendarData,
-					options,
+					this.options,
 					async (updatedData) => {
 						const file = this.app.vault.getAbstractFileByPath(ctx.sourcePath);
 						if (!(file instanceof TFile)) {
@@ -84,9 +92,7 @@ export default class GoalTrackerPlugin extends Plugin {
 							return this.updateCalendarBlock(
 								content,
 								sectionInfo,
-								`type: ${options.type}\ntitle: ${
-									options.title
-								}\n${JSON.stringify(updatedData, null, 2)}`
+								updatedData
 							);
 						});
 					}
@@ -99,7 +105,7 @@ export default class GoalTrackerPlugin extends Plugin {
 	private updateCalendarBlock(
 		content: string,
 		sectionInfo: { lineStart: number; lineEnd: number },
-		newData: string
+		updatedData: CalendarData
 	): string {
 		const lines = content.split("\n");
 		const sectionStart = sectionInfo.lineStart;
@@ -108,6 +114,19 @@ export default class GoalTrackerPlugin extends Plugin {
 		const beforeSection = lines.slice(0, sectionStart + 1).join("\n");
 		const afterSection = lines.slice(sectionEnd).join("\n");
 
-		return `${beforeSection}\n${newData}\n${afterSection}`;
+		// Include all options in the output
+		const optionsText = [
+			`type: ${this.options.type}`,
+			`title: ${this.options.title}`,
+			this.options.showStreak ? "streak: on" : null,
+		]
+			.filter(Boolean)
+			.join("\n");
+
+		return `${beforeSection}\n${optionsText}\n${JSON.stringify(
+			updatedData,
+			null,
+			2
+		)}\n${afterSection}`;
 	}
 }

@@ -3,6 +3,7 @@ import { CalendarData } from "./main";
 export interface CalendarOptions {
 	type: "daily" | "weekly" | "monthly";
 	title: string;
+	showStreak?: boolean;
 }
 
 export class GoalCalendar {
@@ -64,6 +65,133 @@ export class GoalCalendar {
 		this.render();
 	}
 
+	private calculateStreak(): number {
+		if (!this.options.showStreak) return 0;
+
+		const dates = Object.entries(this.data.goals)
+			.filter(([_, completed]) => completed)
+			.map(([date]) => date)
+			.sort();
+
+		if (dates.length === 0) return 0;
+
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		if (this.options.type === "daily") {
+			// Convert string dates to Date objects and sort them in reverse chronological order
+			const completedDates = dates
+				.map((date) => new Date(date))
+				.sort((a, b) => b.getTime() - a.getTime()); // Sort in reverse order
+
+			let currentStreak = 0;
+			let lastDate: Date | null = null;
+
+			for (const date of completedDates) {
+				if (date > today) continue; // Skip future dates
+
+				if (!lastDate) {
+					currentStreak = 1;
+					lastDate = date;
+					continue;
+				}
+
+				// Check if this date is consecutive with the last date
+				const dayDiff = Math.round(
+					(lastDate.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+				);
+				if (dayDiff === 1) {
+					currentStreak++;
+					lastDate = date;
+				} else {
+					break; // Break on first gap - we only want the most recent streak
+				}
+			}
+			return currentStreak;
+		} else if (this.options.type === "weekly") {
+			// Sort weeks in reverse chronological order
+			const completedWeeks = dates
+				.filter((date) => date.includes("-W"))
+				.sort((a, b) => b.localeCompare(a)); // Sort in reverse order
+
+			let currentStreak = 0;
+			let prevWeek: string | null = null;
+
+			for (const weekStr of completedWeeks) {
+				const [year, week] = weekStr.split("-W").map(Number);
+				if (!prevWeek) {
+					currentStreak = 1;
+					prevWeek = weekStr;
+					continue;
+				}
+
+				const [prevYear, prevWeekNum] = prevWeek.split("-W").map(Number);
+				// Check if weeks are consecutive
+				if (
+					(year === prevYear && week === prevWeekNum - 1) ||
+					(year === prevYear - 1 && prevWeekNum === 1 && week === 52)
+				) {
+					currentStreak++;
+					prevWeek = weekStr;
+				} else {
+					break; // Break on first gap
+				}
+			}
+			return currentStreak;
+		} else if (this.options.type === "monthly") {
+			// Sort months in reverse chronological order
+			const completedMonths = dates.sort((a, b) => b.localeCompare(a));
+
+			let currentStreak = 0;
+			let lastMonth: string | null = null;
+
+			for (const monthStr of completedMonths) {
+				const [year, month] = monthStr.split("-").map(Number);
+				if (!lastMonth) {
+					currentStreak = 1;
+					lastMonth = monthStr;
+					continue;
+				}
+
+				const [lastYear, lastMonthNum] = lastMonth.split("-").map(Number);
+				// Check if months are consecutive
+				if (
+					(year === lastYear && month === lastMonthNum - 1) ||
+					(year === lastYear - 1 && lastMonthNum === 1 && month === 12)
+				) {
+					currentStreak++;
+					lastMonth = monthStr;
+				} else {
+					break; // Break on first gap
+				}
+			}
+			return currentStreak;
+		}
+
+		return 0;
+	}
+
+	private renderStreakCounter() {
+		if (!this.options.showStreak) return;
+
+		const streak = this.calculateStreak();
+		const streakContainer = this.container.createEl("div", {
+			cls: "goal-tracker-streak",
+		});
+
+		// Get the correct plural form based on type
+		const unit =
+			this.options.type === "daily"
+				? "day"
+				: this.options.type === "weekly"
+				? "week"
+				: "month";
+
+		streakContainer.createEl("span", {
+			text: `Current streak: ${streak} ${unit}${streak !== 1 ? "s" : ""}`,
+		});
+	}
+
 	render() {
 		this.container.empty();
 
@@ -72,6 +200,9 @@ export class GoalCalendar {
 			text: this.options.title,
 			cls: "goal-tracker-title",
 		});
+
+		// Add streak counter right after title
+		this.renderStreakCounter();
 
 		this.renderCalendarControls();
 
