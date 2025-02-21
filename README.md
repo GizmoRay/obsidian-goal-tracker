@@ -32,7 +32,7 @@ To add a goal tracker to your note, create a code block with the `goal-calendar`
 
 #### Streak tracker
 
-Use "status: on" within the configuration to enable a longest recent streak feature.
+Use "streak: on" within the configuration to enable a longest recent streak feature.
 
 Example:
 
