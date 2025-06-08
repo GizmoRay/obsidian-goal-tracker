@@ -1,6 +1,6 @@
 {
 	"name": "goal-tracker-obsidian",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "An Obsidian plugin for tracking goals with a calendar view",
 	"main": "main.js",
 	"scripts": {
