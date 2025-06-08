@@ -2,6 +2,8 @@
 
 A simple and flexible goal tracking plugin for Obsidian that allows you to track your goals using daily, weekly, or monthly views.
 
+_Does not require any other plugins, or custom-coding. Just use the markup format below and everything works_
+
 ## Features
 
 - Three different tracking views:
